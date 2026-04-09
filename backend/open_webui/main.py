@@ -71,6 +71,7 @@ from open_webui.socket.main import (
 from open_webui.routers import (
     analytics,
     audio,
+    documents,
     images,
     ollama,
     openai,
@@ -1493,6 +1494,7 @@ app.include_router(tasks.router, prefix='/api/v1/tasks', tags=['tasks'])
 app.include_router(images.router, prefix='/api/v1/images', tags=['images'])
 
 app.include_router(audio.router, prefix='/api/v1/audio', tags=['audio'])
+app.include_router(documents.router, prefix='/api/v1/documents', tags=['documents'])
 app.include_router(retrieval.router, prefix='/api/v1/retrieval', tags=['retrieval'])
 
 app.include_router(configs.router, prefix='/api/v1/configs', tags=['configs'])
