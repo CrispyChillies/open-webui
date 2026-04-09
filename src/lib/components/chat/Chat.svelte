@@ -171,6 +171,32 @@
 	let chatFiles = [];
 	let files = [];
 	let params = {};
+	const DOCUMENT_ADD_EVENT = 'open-webui:documents:add';
+	const DOCUMENT_UPDATE_EVENT = 'open-webui:documents:update';
+
+	const addDocumentFilesToChat = (event: Event) => {
+		const detail = (event as CustomEvent)?.detail;
+		const incomingFiles = Array.isArray(detail?.files) ? detail.files : [];
+		if (incomingFiles.length === 0) return;
+
+		files = [
+			...files,
+			...incomingFiles.filter(
+				(incoming) => !files.some((existing) => existing.itemId && existing.itemId === incoming.itemId)
+			)
+		];
+	};
+
+	const updateDocumentFileInChat = (event: Event) => {
+		const incoming = (event as CustomEvent)?.detail?.file;
+		if (!incoming) return;
+
+		files = files.map((file) =>
+			file.itemId === incoming.itemId || (file.document_id && file.document_id === incoming.document_id)
+				? { ...file, ...incoming }
+				: file
+		);
+	};
 
 	$: if (chatIdProp) {
 		navigateHandler();
@@ -761,6 +787,8 @@
 			chatInput?.focus();
 		};
 		init();
+		window.addEventListener(DOCUMENT_ADD_EVENT, addDocumentFilesToChat as EventListener);
+		window.addEventListener(DOCUMENT_UPDATE_EVENT, updateDocumentFileInChat as EventListener);
 
 		return () => {
 			try {
@@ -768,6 +796,11 @@
 				showControlsSubscribe();
 				selectedFolderSubscribe();
 				window.removeEventListener('message', onMessageHandler);
+				window.removeEventListener(DOCUMENT_ADD_EVENT, addDocumentFilesToChat as EventListener);
+				window.removeEventListener(
+					DOCUMENT_UPDATE_EVENT,
+					updateDocumentFileInChat as EventListener
+				);
 				$socket?.off('events', chatEventHandler);
 				audioQueueInstance?.destroy();
 				audioQueue.set(null);

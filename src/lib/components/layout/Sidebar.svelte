@@ -64,8 +64,10 @@
 	import Sidebar from '../icons/Sidebar.svelte';
 	import PinnedModelList from './Sidebar/PinnedModelList.svelte';
 	import Note from '../icons/Note.svelte';
+	import DocumentArrowUp from '../icons/DocumentArrowUp.svelte';
 	import { slide } from 'svelte/transition';
 	import HotkeyHint from '../common/HotkeyHint.svelte';
+	import DocumentsUploadModal from './Sidebar/DocumentsUploadModal.svelte';
 
 	const BREAKPOINT = 768;
 
@@ -84,6 +86,7 @@
 	let showCreateFolderModal = false;
 
 	let pinnedModels = [];
+	let showDocumentsUploadModal = false;
 
 	let showPinnedModels = false;
 	let showChannels = false;
@@ -670,6 +673,8 @@
 	}}
 />
 
+<DocumentsUploadModal bind:show={showDocumentsUploadModal} />
+
 <button
 	id="sidebar-new-chat-button"
 	class="hidden"
@@ -790,6 +795,25 @@
 						</Tooltip>
 					</div>
 				{/if}
+
+				<div class="">
+					<Tooltip content={$i18n.t('Documents')} placement="right">
+						<button
+							class=" cursor-pointer flex rounded-xl hover:bg-gray-100 dark:hover:bg-gray-850 transition group"
+							on:click={(e) => {
+								e.stopImmediatePropagation();
+								e.preventDefault();
+								showDocumentsUploadModal = true;
+							}}
+							draggable="false"
+							aria-label={$i18n.t('Documents')}
+						>
+							<div class=" self-center flex items-center justify-center size-9">
+								<DocumentArrowUp className="size-4.5" />
+							</div>
+						</button>
+					</Tooltip>
+				</div>
 
 				{#if $user?.role === 'admin' || $user?.permissions?.workspace?.models || $user?.permissions?.workspace?.knowledge || $user?.permissions?.workspace?.prompts || $user?.permissions?.workspace?.tools}
 					<div class="">
@@ -1021,6 +1045,26 @@
 							</a>
 						</div>
 					{/if}
+
+					<div class="px-[0.4375rem] flex justify-center text-gray-800 dark:text-gray-200">
+						<button
+							id="sidebar-documents-button"
+							class="grow flex items-center space-x-3 rounded-2xl px-2.5 py-2 hover:bg-gray-100 dark:hover:bg-gray-900 transition"
+							on:click={() => {
+								showDocumentsUploadModal = true;
+							}}
+							draggable="false"
+							aria-label={$i18n.t('Documents')}
+						>
+							<div class="self-center">
+								<DocumentArrowUp className="size-4.5" strokeWidth="2" />
+							</div>
+
+							<div class="flex self-center translate-y-[0.5px]">
+								<div class=" self-center text-sm font-primary">{$i18n.t('Documents')}</div>
+							</div>
+						</button>
+					</div>
 
 					{#if $user?.role === 'admin' || $user?.permissions?.workspace?.models || $user?.permissions?.workspace?.knowledge || $user?.permissions?.workspace?.prompts || $user?.permissions?.workspace?.tools}
 						<div class="px-[0.4375rem] flex justify-center text-gray-800 dark:text-gray-200">
